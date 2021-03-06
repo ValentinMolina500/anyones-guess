@@ -28,14 +28,47 @@ app.get('/api/hello', (req, res) => {
   res.send({ express: 'Panda' });
 });
 
-app.post('/api/world', (req, res) => {
+app.post('/api/createPlayer', (req, res) => {
   console.log(req.body);
   db.ref('/players').push({
-    username: req.body.username
+    username: req.body.username,
   })
   res.send(
     `Added a player dawg!`,
   );
 });
+
+const categories = {
+  animals: [
+    "Cow",
+    "Dog",
+    "Cat",
+    "Monkey"
+  ],
+  comedians: [
+    "Kevin Hart",
+    "Dave Chappelle",
+    "Chris Rock",
+    "Eddie Murphy"
+  ],
+  musicians: [
+    "Kanye West",
+    "The Weeknd", 
+    "Drake",
+    "Cardi B"
+  ],
+  actors: [
+    "The Rock",
+    "Jackie Chan",
+    "Will Smith",
+    "Scarlett Johansson"
+  ],
+  athletes: [
+    "Tom Brady",
+    "Michael Jordan",
+    "Serena Williams",
+    "Tiger Woods"
+  ]
+}
 
 app.listen(port, () => console.log(`Listening on port ${port}`));

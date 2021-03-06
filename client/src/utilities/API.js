@@ -10,7 +10,7 @@ class API {
   // }
 
   addPlayer = async (username) => {
-    const result = await fetch("api/world", {
+    const result = await fetch("api/createPlayer", {
       method: "POST",
       headers: {
         'Content-Type': 'application/json'
