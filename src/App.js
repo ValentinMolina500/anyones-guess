@@ -1,24 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import { Button, Grid, Heading, Input, Box } from '@chakra-ui/react';
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Grid h="100vh" w="100vw" placeItems="center">
+      <Box textAlign="center">
+        <Heading mb="8">Anyones Guess</Heading>
+        <Input mb="8"></Input>
+        <Button>Play Game</Button>
+      </Box>
+    </Grid>
   );
 }
 
