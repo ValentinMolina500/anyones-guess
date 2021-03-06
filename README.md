@@ -2,4 +2,4 @@
 
 An charades like game!
 
-Made by Valentin Molina
+Made by Valentin Molina and Francisco Javier Lopez
