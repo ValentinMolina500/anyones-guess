@@ -2,6 +2,7 @@ import { Button, Grid, Heading, Input, Box, background } from '@chakra-ui/react'
 import Background from './images/thinking.jpg';
 import React from 'react';
 import API from './utilities/API';
+import { useHistory } from 'react-router-dom';
 
 const styles = {
   paperContainer: {
@@ -16,8 +17,11 @@ function Landing() {
   const handleChange = (event) => setValue(event.target.value)
   const [value, setValue] = React.useState("")
 
+  const history = useHistory();
+
   const testAPI = async (username) =>{
     const result = await API.addPlayer(username);
+    history.push('./Game');
   }
 
   return (
