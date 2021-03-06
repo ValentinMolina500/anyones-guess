@@ -1,35 +1,26 @@
-import { Button, Grid, Heading, Input, Box, background } from '@chakra-ui/react';
-import Background from './images/thinking.jpg';
 import React from 'react';
-import API from './utilities/API';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from 'react-router-dom'
 
-const styles = {
-  paperContainer: {
-    backgroundImage: `url(${Background})`,
-    backgroundPosition: 'center',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat'
-  }
-};
-
+import Landing from './Landing';
+import Game from './Game';
 
 function App() {
-
-  const handleChange = (event) => setValue(event.target.value)
-  const [value, setValue] = React.useState("")
-
-  const testAPI = async (username) =>{
-    const result = await API.addPlayer(username);
-  }
-
   return (
-    <Grid style={styles.paperContainer} h="100vh" w="100vw" placeItems="center">
-      <Box textAlign="center" w="100%" maxW="20rem">
-        <Heading textColor="white" mb="1.5rem">Anyone's Guess</Heading>
-        <Input onChange={handleChange} color="white" mb="1rem" placeholder="In Game Name"/>
-        <Button w="50%" onClick={() => testAPI(value)}>Play Game</Button>
-      </Box>
-    </Grid>
+    <Router>
+      <div className='App'>
+        <Switch>
+          <Route exact path="/game" component={Game} />
+          <Route exact path='/' component={Landing} />
+          {/* Redirect to Landing page on invalid route, could be 404 in future */}
+          <Redirect to='/' />
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
