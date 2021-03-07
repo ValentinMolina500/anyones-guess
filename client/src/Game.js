@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import socketClient from "socket.io-client";
+
 import { useLocation } from "react-router-dom";
 import {
   Box,
@@ -9,7 +10,8 @@ import {
   Button,
   GridItem,
   Grid,
-  Text
+  Text,
+  Heading
 } from "@chakra-ui/react";
 import socket from "./utilities/socket";
 
@@ -73,7 +75,10 @@ export default function ClientComponent() {
   return (
     <Grid gridTemplateColumns="auto 1fr" h="100vh" w="100vw">
       <GridItem overflow="hidden" gridColumn="1" w="20rem" borderRight="1px solid" borderRightColor="gray.900">
-        <List overflowY="auto"  bg="gray.700" boxShadow="lg" color="white" minH="100vh">
+        <Box textAlign="center" w="100%" maxW="20rem">
+          <Heading bg="gray.700" textColor="white">Lobby</Heading>
+        </Box>
+        <List overflowY="auto"  textAlign="center" bg="gray.700" boxShadow="lg" color="white" minH="100vh">
           {renderUsers()}
         </List>
       </GridItem>
