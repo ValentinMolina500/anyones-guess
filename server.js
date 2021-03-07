@@ -1,74 +1,75 @@
-require('dotenv').config();
-require('firebase/database')
-const fb = require('firebase/app').default;
-const express = require('express');
-const bodyParser = require('body-parser');
-
-const app = express();
-const port = process.env.PORT || 5000;
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-/* init firebase */
-const config = {
-  apiKey: process.env.APP_API_KEY,
-  authDomain: process.env.APP_AUTH_DOMAIN,
-  databaseURL: process.env.APP_DATABASE_URL,
-  projectId: process.env.APP_PROJECT_ID,
-  storageBucket: process.env.APP_STORAGE_BUCKET,
-  messagingSenderId: process.env.APP_MESSAGING_SENDER_ID,
-  appId: process.env.APP_APP_ID
-}
-fb.initializeApp(config)
-console.log('FB INIT!');
-const db = fb.database();
-
-app.get('/api/hello', (req, res) => {
-  res.send({ express: 'Panda' });
+const httpServer = require("http").createServer();
+const io = require("socket.io")(httpServer, {
+  cors: {
+    origin: "*",
+  },
 });
 
-app.post('/api/createPlayer', (req, res) => {
-  console.log(req.body);
-  db.ref('/players').push({
-    username: req.body.username,
+io.use((socket, next) => {
+  const username = socket.handshake.auth.username;
+  if (!username) {
+    return next(new Error("invalid username"));
+  }
+  socket.username = username;
+  next();
+});
+
+const Status = {
+  WAITING_FOR_PLAYERS: 0,
+  IN_GAME: 1
+};
+
+const playerOne = null;
+const playerTwo = null;
+const users = [];
+const status = Status.WAITING_FOR_PLAYERS;
+
+io.on("connection", (socket) => {
+  // fetch existing users
+  const users = [];
+  for (let [id, socket] of io.of("/").sockets) {
+    users.push({
+      userID: id,
+      username: socket.username,
+    });
+  }
+  socket.emit("users", users);
+
+  // notify existing users
+  socket.broadcast.emit("user connected", {
+    userID: socket.id,
+    username: socket.username,
+  });
+
+  // forward the private message to the right recipient
+  socket.on("private message", ({ content, to }) => {
+    socket.to(to).emit("private message", {
+      content,
+      from: socket.id,
+    });
+  });
+
+  // notify users upon disconnection
+  socket.on("disconnect", () => {
+    socket.broadcast.emit("user disconnected", socket.id);
+  });
+
+  // notify users upon message
+  socket.on("message sent", (msg) => {
+    console.log("message sent: ", msg);
+    const message = {
+      content: msg,
+      id: socket.id,
+      timestamp: new Date().toDateString(),
+      username: socket.username
+    }
+
+    io.emit("new message", message)
   })
-  res.send(
-    `Added a player dawg!`,
-  );
 });
 
-const categories = {
-  animals: [
-    "Cow",
-    "Dog",
-    "Cat",
-    "Monkey"
-  ],
-  comedians: [
-    "Kevin Hart",
-    "Dave Chappelle",
-    "Chris Rock",
-    "Eddie Murphy"
-  ],
-  musicians: [
-    "Kanye West",
-    "The Weeknd", 
-    "Drake",
-    "Cardi B"
-  ],
-  actors: [
-    "The Rock",
-    "Jackie Chan",
-    "Will Smith",
-    "Scarlett Johansson"
-  ],
-  athletes: [
-    "Tom Brady",
-    "Michael Jordan",
-    "Serena Williams",
-    "Tiger Woods"
-  ]
-}
+const PORT = process.env.PORT || 5000;
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+httpServer.listen(PORT, () =>
+  console.log(`server listening at http://localhost:${PORT}`)
+);
