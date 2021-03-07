@@ -88,7 +88,9 @@ export default function ClientComponent() {
       return (
         <ListItem p="0.5rem" key={i}>
           <Text fontSize="sm" fontWeight="bold" color="gray.300">{msg.username}</Text>
-          <Tag colorScheme={msg.id === socket.id ? "teal" : "blue"}>{msg.content}</Tag>
+          <Tag wordWrap = 'break-word' colorScheme={msg.id === socket.id ? "teal" : "blue"}>
+            <Text>{msg.content}</Text>
+          </Tag>
           <Text fontSize="xs" fontStyle = "italic" color="gray.300">{timestamp}</Text>
         </ListItem>
       );
