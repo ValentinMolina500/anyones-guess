@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import socketClient from "socket.io-client";
 
 import { useLocation, useHistory } from "react-router-dom";
 import {
@@ -12,15 +11,23 @@ import {
   Grid,
   Text,
   Heading,
-  Tag
+  Tag,
+  Spinner,
+  Flex
 } from "@chakra-ui/react";
 import socket from "./utilities/socket";
+
+const Status = {
+  WAITING_FOR_PLAYERS: 0,
+  IN_GAME: 1
+};
 
 export default function ClientComponent() {
   const history = useHistory();
   const [messages, setMessages] = useState([]);
   const [value, setValue] = useState("");
   const [users, setUsers] = useState([]);
+  const [gameState, setGameState] = useState({})
   const temp = useLocation();
 
   if (!temp.username) {
@@ -29,6 +36,8 @@ export default function ClientComponent() {
   useEffect(() => {
     socket.auth = { username: temp.username }
     socket.connect();
+
+    /* Setup listeners */
     socket.on("users", (users) => {
       setUsers(users);
     });
@@ -36,6 +45,7 @@ export default function ClientComponent() {
     socket.on("user connected", (user) => {
       setUsers((oldUsers) => [...oldUsers, user]);
     });
+
     socket.on("user disconnected", (id) => {
       console.log("id: ", id);
       setUsers((oldUsers) => oldUsers.filter((user) => user.userID !== id));
@@ -44,6 +54,11 @@ export default function ClientComponent() {
     socket.on("new message", (msg) => {
       setMessages((oldMsgs) => [...oldMsgs, msg]);
     });
+
+    socket.on("game state", (state) => {
+      console.log("this is state: ", state);
+      setGameState(state)
+    })
 
     return () => socket.disconnect();
   }, []);
@@ -85,13 +100,20 @@ export default function ClientComponent() {
 
   return (
     <Grid gridTemplateColumns="auto 1fr" h="100vh" w="100vw">
-      <GridItem overflow="hidden" gridColumn="1" w="20rem" borderRight="1px solid" borderRightColor="gray.900">
+      <GridItem pt="1rem" overflow="hidden" bg="gray.700" boxShadow="lg" gridColumn="1" w="20rem" borderRight="1px solid" borderRightColor="gray.900">
         <Box textAlign="center" w="100%" maxW="20rem">
-          <Heading bg="gray.700" textColor="white">Lobby</Heading>
+          <Heading bg="gray.700" fontSize="md" textColor="white">Lobby</Heading>
         </Box>
-        <List overflowY="auto"  textAlign="center" bg="gray.700" boxShadow="lg" color="white" minH="100vh">
+        <List overflowY="auto"  textAlign="center"   color="white">
           {renderUsers()}
         </List>
+        {
+          gameState.status === Status.WAITING_FOR_PLAYERS &&
+          <Flex mt="1rem" flexDirection="column" alignItems="center">
+            <Spinner color="white"/>
+            <Text color="white">Wating for more players...</Text>
+          </Flex>
+        }
       </GridItem>
 
       <GridItem overflow="hidden"  h="100%">
