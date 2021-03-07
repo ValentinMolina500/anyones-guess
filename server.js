@@ -24,22 +24,64 @@ const Status = {
   IN_GAME: 1
 };
 
-const playerOne = null;
-const playerTwo = null;
-const users = [];
-const status = Status.WAITING_FOR_PLAYERS;
+let users = [];
 
+/* Game variables */
+let status = Status.WAITING_FOR_PLAYERS;
+let playerOne = null;
+let playerTwo = null;
+let currentPlayerTurn = null;
+let playerOneNoun = null;
+let playerTwoNoun = null;
+/* Util functions */
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+const startGame = () => {
+  const randomOne = getRandomInt(users.length);
+  let randomTwo;
+  do {
+    randomTwo = getRandomInt(users.length);
+  } while (randomTwo === randomOne)
+
+  playerOne = users[randomOne];
+  playerTwo = users[randomTwo];
+  status = Status.IN_GAME;
+  currentPlayerTurn = playerOne
+  playerOneNoun = "dog"
+  playerTwoNoun = "monkey"
+
+  setGameStatus({
+    playerOne,
+    playerTwo,
+    status,
+    currentPlayerTurn,
+    playerOneNoun,
+    playerTwoNoun
+  });
+}
+
+const setGameStatus = (value) => {
+  io.emit("game state", value);
+}
 io.on("connection", (socket) => {
   // fetch existing users
-  const users = [];
-  for (let [id, socket] of io.of("/").sockets) {
-    users.push({
-      userID: id,
-      username: socket.username,
-    });
-  }
-  socket.emit("users", users);
+  // const users = []
+  // for (let [id, socket] of io.of("/").sockets) {
+  //   users.push({
+  //     userID: id,
+  //     username: socket.username,
+  //   });
+  // }
+  users.push({
+    userID: socket.id,
+    username: socket.username
+  });
 
+  console.log(users);
+
+  socket.emit("users", users);
   // notify existing users
   socket.broadcast.emit("user connected", {
     userID: socket.id,
@@ -56,6 +98,7 @@ io.on("connection", (socket) => {
 
   // notify users upon disconnection
   socket.on("disconnect", () => {
+    users = users.filter((user) => user.userID !== socket.id);
     socket.broadcast.emit("user disconnected", socket.id);
   });
 
@@ -71,6 +114,42 @@ io.on("connection", (socket) => {
 
     io.emit("new message", message)
   })
+
+  if (users.length > 2 && status !== Status.IN_GAME) {
+    console.log("starting game")
+    startGame();
+  } else {
+    setGameStatus({
+      playerOne,
+      playerTwo,
+      status,
+      currentPlayerTurn,
+      playerOneNoun,
+      playerTwoNoun
+    })
+  }
+  
+  // if (users.length > 2 || status !== Status.IN_GAME) {
+  //   console.log("Starting game with...\n");
+  //   console.log(JSON.stringify({
+  //     playerOne,
+  //     playerTwo,
+  //     status,
+  //     currentPlayerTurn,
+  //     playerOneNoun,
+  //     playerTwoNoun
+  //   }))
+  //   startGame();
+  // } else {
+  //   setGameStatus({
+  //     playerOne,
+  //     playerTwo,
+  //     status,
+  //     currentPlayerTurn,
+  //     playerOneNoun,
+  //     playerTwoNoun
+  //   })
+  // }
 });
 
 
