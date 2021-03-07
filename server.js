@@ -1,6 +1,7 @@
 
 const path = require("path");
 const express = require("express");
+const e = require("express");
 const app = express();
 const http = require('http').createServer(app);
 
@@ -24,15 +25,30 @@ const Status = {
   IN_GAME: 1
 };
 
+const TurnStatus = {
+  PLAYER1_ASK: 0,
+  PLAYER1_RESPONSE: 1,
+  PLAYER2_ASK: 2,
+  PLAYYER2_RESPONSE: 3
+}
+
 let users = [];
 
 /* Game variables */
 let status = Status.WAITING_FOR_PLAYERS;
+let turnStatus = null;
 let playerOne = null;
 let playerTwo = null;
 let currentPlayerTurn = null;
 let playerOneNoun = null;
 let playerTwoNoun = null;
+let fsm2_list = [];
+let fsm4_list = [];
+let playerOneTries = -1;
+let playerTwoTries = -1;
+let gameover = null;
+
+
 /* Util functions */
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -45,6 +61,7 @@ const startGame = () => {
     randomTwo = getRandomInt(users.length);
   } while (randomTwo === randomOne)
 
+  turnStatus = TurnStatus.PLAYER1_ASK
   playerOne = users[randomOne];
   playerTwo = users[randomTwo];
   status = Status.IN_GAME;
@@ -74,6 +91,9 @@ const startGame = () => {
 
   playerOneNoun = cat1;
   playerTwoNoun = cat2;
+  playerOneTries = 6;
+  playerTwoTries = 6;
+  gameover = false 
 
   setGameStatus({
     playerOne,
@@ -81,14 +101,35 @@ const startGame = () => {
     status,
     currentPlayerTurn,
     playerOneNoun,
-    playerTwoNoun
+    playerTwoNoun,
+    turnStatus,
+    fsm2_list,
+    fsm4_list,
+    playerOneTries,
+    playerTwoTries,
+    gameover
   });
 }
 
 
 const setGameStatus = (value) => {
   io.emit("game state", value);
+
+  if (status === Status.IN_GAME) {
+    io.emit("new message", {
+      type: "system",
+      content: `GAME START, Player 1: ${playerOne.username}, Player 2: ${playerTwo.username}`
+    });
+
+    io.emit("new message", {
+      type: "system",
+      content: `Player 1 ask`
+    });
+    
+  }
+  
 }
+
 io.on("connection", (socket) => {
   // fetch existing users
   // const users = []
@@ -133,10 +174,158 @@ io.on("connection", (socket) => {
       content: msg,
       id: socket.id,
       timestamp: new Date(),
-      username: socket.username
+      username: socket.username,
+      type: 'regular'
     }
 
     io.emit("new message", message)
+  })
+
+  // FSM 1 
+  socket.on("player one ask", (msg) => {
+   
+    const message = {
+      content: msg,
+      id: socket.id,
+      timestamp: new Date(),
+      username: socket.username,
+      type: 'playerOneAsk'
+    }
+    
+    turnStatus = TurnStatus.PLAYER1_RESPONSE;
+    fsm2_list = users.filter(user => user.userID !== playerOne.userID);
+    
+    io.emit("game state", {
+      playerOne,
+      playerTwo,
+      status,
+      currentPlayerTurn,
+      playerOneNoun,
+      playerTwoNoun,
+      turnStatus,
+      fsm2_list,
+      fsm4_list,
+      playerOneTries,
+      playerTwoTries,
+      gameover
+    })
+
+   
+    io.emit("new message", message)
+    io.emit("new message", {
+      type: "system",
+      content: `Others respond`
+    });
+  })
+
+  // FSM 2
+  socket.on("player one response", (msg) => {
+    /* Create the message */
+    const message = {
+      content: msg,
+      id: socket.id,
+      timestamp: new Date(),
+      username: socket.username,
+      type: 'regular'
+    }
+
+    /* Remove user from list */
+    fsm2_list = fsm2_list.filter(user => socket.id !== user.userID);
+    io.emit("new message", message);
+    if (fsm2_list.length === 0) {
+      io.emit("new message", {
+        type: "system",
+        content: `Player 2 ask`
+      });
+      turnStatus = TurnStatus.PLAYER2_ASK;
+    }
+    io.emit("game state", {
+      playerOne,
+      playerTwo,
+      status,
+      currentPlayerTurn,
+      playerOneNoun,
+      playerTwoNoun,
+      turnStatus,
+      fsm2_list,
+      fsm4_list,
+      playerOneTries,
+      playerTwoTries,
+      gameover
+    })
+  })
+
+  // FSM 3
+  socket.on("player two ask", (msg) => {
+    const message = {
+      content: msg,
+      id: socket.id,
+      timestamp: new Date(),
+      username: socket.username,
+      type: 'playerTwoAsk'
+    }
+
+    
+    turnStatus = TurnStatus.PLAYER2_RESPONSE;
+    fsm4_list = users.filter(user => user.userID !== playerTwo.userID);
+    
+    io.emit("new message", message)
+    io.emit("new message", {
+      type: "system",
+      content: `Others respond`
+    });
+    io.emit("game state", {
+      playerOne,
+      playerTwo,
+      status,
+      currentPlayerTurn,
+      playerOneNoun,
+      playerTwoNoun,
+      turnStatus,
+      fsm2_list,
+      fsm4_list,
+      playerOneTries,
+      playerTwoTries,
+      gameover
+    })
+    
+  })
+
+  socket.on("player two response", (msg) => {
+    /* Create the message */
+    const message = {
+      content: msg,
+      id: socket.id,
+      timestamp: new Date(),
+      username: socket.username,
+      type: 'regular'
+    }
+
+    /* Remove user from list */
+    fsm4_list = fsm4_list.filter(user => socket.id !== user.userID);
+    io.emit("new message", message);
+
+    if (fsm4_list.length === 0) {
+      io.emit("new message", {
+        type: "system",
+        content: `Player 1 ask`
+      });
+      turnStatus = TurnStatus.PLAYER1_ASK;
+    }
+    io.emit("game state", {
+      playerOne,
+      playerTwo,
+      status,
+      currentPlayerTurn,
+      playerOneNoun,
+      playerTwoNoun,
+      turnStatus,
+      fsm2_list,
+      fsm4_list,
+      playerOneTries,
+      playerTwoTries,
+      gameover
+    })
   })
 
   if (users.length > 2 && status !== Status.IN_GAME) {
@@ -149,10 +338,71 @@ io.on("connection", (socket) => {
       status,
       currentPlayerTurn,
       playerOneNoun,
-      playerTwoNoun
+      playerTwoNoun,
+      turnStatus,
+      fsm2_list,
+      fsm4_list,
+      playerOneTries,
+      playerTwoTries,
+      gameover
     })
   }
   
+  socket.on("player one guess", (guess) => {
+    if (guess.trim().toLowerCase() === playerOneNoun.toLowerCase()) {
+      io.emit("game win", playerOne)
+    } else {
+      playerOneTries--;
+      if (playerOneTries === 0) {
+        io.emit("game win", playerTwo);
+      } else {
+        io.emit("game state", {
+          playerOne,
+          playerTwo,
+          status,
+          currentPlayerTurn,
+          playerOneNoun,
+          playerTwoNoun,
+          turnStatus,
+          fsm2_list,
+          fsm4_list,
+          playerOneTries,
+          playerTwoTries,
+          gameover
+        })
+      }
+
+      
+    }
+  })
+
+  socket.on("player two guess", (guess) => {
+    if (guess.trim().toLowerCase() === playerTwoNoun.toLowerCase()) {
+      io.emit("game win", playerTwo)
+    } else {
+      playerTwoTries--;
+      if (playerTwoTries === 0) {
+        io.emit("game win", playerOne);
+      } else {
+        io.emit("game state", {
+          playerOne,
+          playerTwo,
+          status,
+          currentPlayerTurn,
+          playerOneNoun,
+          playerTwoNoun,
+          turnStatus,
+          fsm2_list,
+          fsm4_list,
+          playerOneTries,
+          playerTwoTries,
+          gameover
+        })
+      }
+
+      
+    }
+  })
   // if (users.length > 2 || status !== Status.IN_GAME) {
   //   console.log("Starting game with...\n");
   //   console.log(JSON.stringify({
