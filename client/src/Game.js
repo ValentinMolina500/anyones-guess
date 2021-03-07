@@ -18,6 +18,7 @@ export default function ClientComponent() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
+    socket.auth = { username: "example" }
     socket.connect();
     socket.on("users", (users) => {
       setUsers(users);
