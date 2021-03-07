@@ -30,9 +30,13 @@ export default function ClientComponent() {
   const [gameState, setGameState] = useState({})
   const temp = useLocation();
 
+  /* Send user back on invalid username */
   if (!temp.username) {
     history.push("/");
   }
+
+  const messagesEndRef = useRef(null);
+
   useEffect(() => {
     socket.auth = { username: temp.username }
     socket.connect();
@@ -62,6 +66,10 @@ export default function ClientComponent() {
 
     return () => socket.disconnect();
   }, []);
+
+  useEffect(() => {
+    messagesEndRef.current.scrollIntoView();
+  }, [messages])
 
   const renderUsers = () => {
     return users.map((user, i) => {
@@ -116,7 +124,9 @@ export default function ClientComponent() {
       <GridItem overflow="hidden"  h="100%">
         <Grid h="100%"  gridTemplateRows="1fr auto">
           <List overflowY="auto" bg="gray.800" color="white">
+            
             {renderMessages()}
+            <div ref={messagesEndRef} />
           </List>
           <Box p="1rem" bg="gray.700" >
             <form style={{display: "flex"}}>
