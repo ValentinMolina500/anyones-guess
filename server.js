@@ -66,6 +66,11 @@ const startGame = () => {
   var cat2 = dict[randCat];
   cat2 = cat2[getRandomInt(cat2.length)];
   
+  while (cat1 === cat2){
+    cat2 = dict[randCat];
+    cat2 = cat2[getRandomInt(cat2.length)];
+  }
+
   playerOneNoun = cat1;
   playerTwoNoun = cat2;
 
