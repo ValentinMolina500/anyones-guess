@@ -62,9 +62,6 @@ export default function ClientComponent() {
     return messages.map((msg, i) => {
       const date = new Date(msg.timestamp);
       const timestamp = "Sent " + date.toLocaleTimeString('en-US');
-      // let h = (date.getHours() - 12 );
-      // let m = (date.getUTCMinutes() + 1);
-      // let timestamp = h + ':' + m;
       return (
         <ListItem p="0.5rem" key={i}>
           <Text fontSize="sm" fontWeight="bold" color="gray.300">{msg.username}</Text>

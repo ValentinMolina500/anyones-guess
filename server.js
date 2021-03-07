@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
     const message = {
       content: msg,
       id: socket.id,
-      timestamp: new Date().toDateString(),
+      timestamp: new Date(),
       username: socket.username
     }
 
