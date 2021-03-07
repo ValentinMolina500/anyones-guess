@@ -90,7 +90,7 @@ export default function ClientComponent() {
           </List>
           <Box p="1rem" bg="gray.700" >
             <form style={{display: "flex"}}>
-              <Input value={value} onChange={(e) => setValue(e.target.value)} color="white" variant="outline" placeholder="Outline" />
+              <Input value={value} onChange={(e) => setValue(e.target.value)} color="white" variant="outline" placeholder="Message" />
               <Button ml="1rem" onClick={sendMsg} colorScheme="teal" type="submit">Send</Button>
             </form>
            
