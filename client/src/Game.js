@@ -66,7 +66,6 @@ export default function ClientComponent() {
     });
 
     socket.on("user disconnected", (id) => {
-      console.log("id: ", id);
       setUsers((oldUsers) => oldUsers.filter((user) => user.userID !== id));
     });
 
@@ -75,7 +74,6 @@ export default function ClientComponent() {
     });
 
     socket.on("game state", (state) => {
-      console.log("this is state: ", state);
       setGameState(state);
     });
 
@@ -316,7 +314,6 @@ export default function ClientComponent() {
   }
 
   const renderControls = () => {
-    console.log(gameState);
     if (
       gameState.status === Status.WAITING_FOR_PLAYERS ||
       (gameState &&

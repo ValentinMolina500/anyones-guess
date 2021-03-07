@@ -9,11 +9,8 @@ if (process.env.NODE_ENV === "production") {
   url = dev;
 }
 
-console.log(url);
 
 const socket = io(url, { autoConnect: false });
-socket.onAny((event, ...args) => {
-  console.log(event, args);
-});
+
 
 export default socket;
