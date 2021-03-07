@@ -1,4 +1,4 @@
-# Anyones Guess
+# Anyone's Guess
 
 An charades like game!
 
