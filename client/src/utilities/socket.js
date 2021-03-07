@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === "production") {
   url = dev;
 }
 
-const socket = io(window.location, { autoConnect: false });
+const socket = io(window.location.toString(), { autoConnect: false });
 socket.onAny((event, ...args) => {
   console.log(event, args);
 });
