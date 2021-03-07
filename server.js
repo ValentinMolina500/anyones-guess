@@ -49,8 +49,25 @@ const startGame = () => {
   playerTwo = users[randomTwo];
   status = Status.IN_GAME;
   currentPlayerTurn = playerOne
-  playerOneNoun = "dog"
-  playerTwoNoun = "monkey"
+
+  const categories = ['Actors', 'Athletes', 'Animals'];
+
+  var dict = { 
+    'Actors' : ['Tom Hanks', 'The Rock', 'Keanu Reeves', 'Scarlett Johansson', 'Ellen Pompeo'],
+    'Athletes' : ['LeBron James', 'Serena Williams', 'Allyson Felix', 'Tom Brady', 'Conor McGregor'],
+    'Animals' : ['Dog', 'Cat', 'Lion', 'Fish', 'Bird']
+  };
+
+  var randCat = categories[getRandomInt(categories.length)];
+
+  var cat1 = dict[randCat];
+  cat1 = cat1[getRandomInt(cat1.length)];
+  
+  var cat2 = dict[randCat];
+  cat2 = cat2[getRandomInt(cat2.length)];
+  
+  playerOneNoun = cat1;
+  playerTwoNoun = cat2;
 
   setGameStatus({
     playerOne,
@@ -61,6 +78,7 @@ const startGame = () => {
     playerTwoNoun
   });
 }
+
 
 const setGameStatus = (value) => {
   io.emit("game state", value);
@@ -164,3 +182,4 @@ app.use((req, res, next) => {
 http.listen(PORT, () =>
   console.log(`server listening at http://localhost:${PORT}`)
 );
+
