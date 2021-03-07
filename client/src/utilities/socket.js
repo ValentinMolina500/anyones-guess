@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const production = "https://anyones-guess-80.herokuapp.com:8080/"
+const production = window.location.toString();
 const dev = "http://localhost:8080";
 let url;
 if (process.env.NODE_ENV === "production") {
@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === "production") {
   url = dev;
 }
 
-const socket = io(window.location.toString(), { autoConnect: false });
+const socket = io(url, { autoConnect: false });
 socket.onAny((event, ...args) => {
   console.log(event, args);
 });

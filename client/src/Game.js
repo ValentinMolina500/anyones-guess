@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import socketClient from "socket.io-client";
 
-import { useLocation } from "react-router-dom";
+import { useLocation, useHistory } from "react-router-dom";
 import {
   Box,
   Input,
@@ -17,11 +17,15 @@ import {
 import socket from "./utilities/socket";
 
 export default function ClientComponent() {
+  const history = useHistory();
   const [messages, setMessages] = useState([]);
   const [value, setValue] = useState("");
   const [users, setUsers] = useState([]);
   const temp = useLocation();
 
+  if (!temp.username) {
+    history.push("/");
+  }
   useEffect(() => {
     socket.auth = { username: temp.username }
     socket.connect();
@@ -57,9 +61,9 @@ export default function ClientComponent() {
   const renderMessages = () => {
     return messages.map((msg, i) => {
       return (
-        <ListItem bg={msg.id === socket.id ? "teal.600" : null} p="0.5rem" key={i}>
+        <ListItem p="0.5rem" key={i}>
           <Text fontSize="sm" color="gray.300">{msg.username}</Text>
-          <Tag colorScheme="teal">{msg.content}</Tag>
+          <Tag colorScheme={msg.id === socket.id ? "teal" : "blue"}>{msg.content}</Tag>
         </ListItem>
       );
     });
