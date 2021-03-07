@@ -207,7 +207,7 @@ export default function ClientComponent() {
         return (
           <ListItem textAlign="center">
             <Text fontStyle="italic"  color="white">
-              {`${msg.username} guessed ${msg.content}`}
+              {`${msg.username} guessed ${msg.content} (INCORRECT!)`}
             </Text>
           </ListItem>
         )
