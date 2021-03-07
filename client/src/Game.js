@@ -11,7 +11,8 @@ import {
   GridItem,
   Grid,
   Text,
-  Heading
+  Heading,
+  Tag
 } from "@chakra-ui/react";
 import socket from "./utilities/socket";
 
@@ -58,7 +59,7 @@ export default function ClientComponent() {
       return (
         <ListItem bg={msg.id === socket.id ? "teal.600" : null} p="0.5rem" key={i}>
           <Text fontSize="sm" color="gray.300">{msg.username}</Text>
-          <Text>{msg.content}</Text>
+          <Tag colorScheme="teal">{msg.content}</Tag>
         </ListItem>
       );
     });
@@ -85,7 +86,7 @@ export default function ClientComponent() {
 
       <GridItem overflow="hidden"  h="100%">
         <Grid h="100%"  gridTemplateRows="1fr auto">
-          <List  overflowY="auto" bg="gray.800" color="white">
+          <List overflowY="auto" bg="gray.800" color="white">
             {renderMessages()}
           </List>
           <Box p="1rem" bg="gray.700" >
