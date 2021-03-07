@@ -20,7 +20,10 @@ function Landing() {
   const history = useHistory();
 
   const testAPI = async (username) =>{
-    history.push('./Game');
+    history.push({
+      pathname: './Game',
+      username: value,
+    });
   }
 
   return (

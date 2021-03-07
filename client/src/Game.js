@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import socketClient from "socket.io-client";
+import { useLocation } from "react-router-dom";
 import {
   Box,
   Input,
@@ -16,9 +17,10 @@ export default function ClientComponent() {
   const [messages, setMessages] = useState([]);
   const [value, setValue] = useState("");
   const [users, setUsers] = useState([]);
+  const temp = useLocation();
 
   useEffect(() => {
-    socket.auth = { username: "example" }
+    socket.auth = { username: temp.username }
     socket.connect();
     socket.on("users", (users) => {
       setUsers(users);
