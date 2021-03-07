@@ -8,6 +8,7 @@ import {
 
 import Landing from './Landing';
 import Game from './Game';
+import GameOver from './GameOver';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Switch>
           <Route exact path="/game" component={Game} />
           <Route exact path='/' component={Landing} />
+          <Route exact path='/gameover' component={GameOver} />
           {/* Redirect to Landing page on invalid route, could be 404 in future */}
           <Redirect to='/' />
         </Switch>

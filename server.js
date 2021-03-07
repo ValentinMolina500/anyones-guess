@@ -50,12 +50,13 @@ const startGame = () => {
   status = Status.IN_GAME;
   currentPlayerTurn = playerOne
 
-  const categories = ['Actors', 'Athletes', 'Animals'];
+  const categories = ['Celebrities', 'Athletes', 'Animals', 'Pokemon'];
 
   var dict = { 
-    'Actors' : ['Tom Hanks', 'The Rock', 'Keanu Reeves', 'Scarlett Johansson', 'Ellen Pompeo'],
-    'Athletes' : ['LeBron James', 'Serena Williams', 'Allyson Felix', 'Tom Brady', 'Conor McGregor'],
-    'Animals' : ['Dog', 'Cat', 'Lion', 'Fish', 'Bird']
+    'Celebrities' : ['Jensen Ackles','Andre 3000','Naveen Andrews','Jensen Atwood','Tyler Bachtel','Penn Badgley','Simon Baker','Christian Bale','Eric Balfour','Eric Bana','Alex Band','Antonio Banderas','Ike Barinholtz','Ben Barnes','Eugen Bauder','William Beckett','Tyson Beckford','David Beckham','Jason Behr','Jonathan Bennett ','Sam Bennett ','Dierks Bentley','Gael Garcia Bernal','Jon Bernthal','Wilson Bethel ','Justin Bieber','David Blaine','James Blake','Corbin Bleu','Orlando Bloom','Jon Bon Jovi','Asher Book','David Boreanaz','Tom Bott','Raoul Bova','Bow Wow','Marlon Brando','Adam Brody','Chris Brown','Michel Brown','Justin Bruening','Austin Butler ','Gerard Butler','Santiago Cabrera','Bobby Cannavale ','Nick Cannon','Robert Carmine','Chris Carmack','Ryan Carnes','Anthony Catanzaro','Tom Hanks','The Rock','Keanu Reeves','Scarlett Johansson','Ellen Pompeo'],
+    'Athletes' : ['Muhammad Ali', 'Usain Bolt', 'Michael Jordan', 'Serena Williams', 'Michael Phelps', 'Roger Federer', 'Lionel Messi', 'Ronda Rousey','Allen Iverson','Wayne Gretzky','Michael Vick','Joe DiMaggio','John Elway','Conor McGregor','Lebron James','Alison Felix'],
+    'Animals' : ['Dog', 'Cat', 'Lion', 'Fish', 'Bird', 'Canidae','Felidae', 'Cattle', 'Donkey', 'Goat', 'Guinea Pig', 'Horse', 'Pig', 'Rabbit'],
+    'Pokemon' : ['Bulbasaur','Ivysaur','Venusaur','Charmander','Charmeleon','Charizard','Squirtle','Wartortle','Blastoise','Caterpie','Metapod','Butterfree','Weedle','Kakuna','Beedrill','Pidgey','Pidgeotto','Pidgeot','Rattata','Raticate','Spearow','Fearow','Ekans','Arbok','Pikachu','Raichu','Sandshrew','Sandslash']
   };
 
   var randCat = categories[getRandomInt(categories.length)];
