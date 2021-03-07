@@ -1,5 +1,10 @@
-const httpServer = require("http").createServer();
-const io = require("socket.io")(httpServer, {
+
+const path = require("path");
+const express = require("express");
+const app = express();
+const http = require('http').createServer(app);
+
+const io = require("socket.io")(http, {
   cors: {
     origin: "*",
   },
@@ -68,8 +73,15 @@ io.on("connection", (socket) => {
   })
 });
 
-const PORT = process.env.PORT || 5000;
 
-httpServer.listen(PORT, () =>
+const PORT = process.env.PORT || 8080;
+
+app.use(express.static(path.join(__dirname, "client", "build")));
+
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, "client", "build", "index.html"))
+})
+
+http.listen(PORT, () =>
   console.log(`server listening at http://localhost:${PORT}`)
 );
