@@ -60,10 +60,16 @@ export default function ClientComponent() {
 
   const renderMessages = () => {
     return messages.map((msg, i) => {
+      const date = new Date(msg.timestamp);
+      const timestamp = "Sent " + date.toLocaleTimeString('en-US');
+      // let h = (date.getHours() - 12 );
+      // let m = (date.getUTCMinutes() + 1);
+      // let timestamp = h + ':' + m;
       return (
         <ListItem p="0.5rem" key={i}>
-          <Text fontSize="sm" color="gray.300">{msg.username}</Text>
+          <Text fontSize="sm" fontWeight="bold" color="gray.300">{msg.username}</Text>
           <Tag colorScheme={msg.id === socket.id ? "teal" : "blue"}>{msg.content}</Tag>
+          <Text fontSize="xs" fontStyle = "italic" color="gray.300">{timestamp}</Text>
         </ListItem>
       );
     });
