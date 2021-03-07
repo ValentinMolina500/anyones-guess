@@ -67,13 +67,15 @@ const startGame = () => {
   status = Status.IN_GAME;
   currentPlayerTurn = playerOne
 
-  const categories = ['Celebrities', 'Athletes', 'Animals', 'Pokemon'];
+  const categories = ['Animals', 'Househould Appliance'];
 
   var dict = { 
-    'Celebrities' : ['Jensen Ackles','Andre 3000','Naveen Andrews','Jensen Atwood','Tyler Bachtel','Penn Badgley','Simon Baker','Christian Bale','Eric Balfour','Eric Bana','Alex Band','Antonio Banderas','Ike Barinholtz','Ben Barnes','Eugen Bauder','William Beckett','Tyson Beckford','David Beckham','Jason Behr','Jonathan Bennett ','Sam Bennett ','Dierks Bentley','Gael Garcia Bernal','Jon Bernthal','Wilson Bethel ','Justin Bieber','David Blaine','James Blake','Corbin Bleu','Orlando Bloom','Jon Bon Jovi','Asher Book','David Boreanaz','Tom Bott','Raoul Bova','Bow Wow','Marlon Brando','Adam Brody','Chris Brown','Michel Brown','Justin Bruening','Austin Butler ','Gerard Butler','Santiago Cabrera','Bobby Cannavale ','Nick Cannon','Robert Carmine','Chris Carmack','Ryan Carnes','Anthony Catanzaro','Tom Hanks','The Rock','Keanu Reeves','Scarlett Johansson','Ellen Pompeo'],
-    'Athletes' : ['Muhammad Ali', 'Usain Bolt', 'Michael Jordan', 'Serena Williams', 'Michael Phelps', 'Roger Federer', 'Lionel Messi', 'Ronda Rousey','Allen Iverson','Wayne Gretzky','Michael Vick','Joe DiMaggio','John Elway','Conor McGregor','Lebron James','Alison Felix'],
-    'Animals' : ['Dog', 'Cat', 'Lion', 'Fish', 'Bird', 'Canidae','Felidae', 'Cattle', 'Donkey', 'Goat', 'Guinea Pig', 'Horse', 'Pig', 'Rabbit'],
-    'Pokemon' : ['Bulbasaur','Ivysaur','Venusaur','Charmander','Charmeleon','Charizard','Squirtle','Wartortle','Blastoise','Caterpie','Metapod','Butterfree','Weedle','Kakuna','Beedrill','Pidgey','Pidgeotto','Pidgeot','Rattata','Raticate','Spearow','Fearow','Ekans','Arbok','Pikachu','Raichu','Sandshrew','Sandslash']
+    // 'Celebrities' : ['Jensen Ackles','Andre 3000','Naveen Andrews','Jensen Atwood','Tyler Bachtel','Penn Badgley','Simon Baker','Christian Bale','Eric Balfour','Eric Bana','Alex Band','Antonio Banderas','Ike Barinholtz','Ben Barnes','Eugen Bauder','William Beckett','Tyson Beckford','David Beckham','Jason Behr','Jonathan Bennett ','Sam Bennett ','Dierks Bentley','Gael Garcia Bernal','Jon Bernthal','Wilson Bethel ','Justin Bieber','David Blaine','James Blake','Corbin Bleu','Orlando Bloom','Jon Bon Jovi','Asher Book','David Boreanaz','Tom Bott','Raoul Bova','Bow Wow','Marlon Brando','Adam Brody','Chris Brown','Michel Brown','Justin Bruening','Austin Butler ','Gerard Butler','Santiago Cabrera','Bobby Cannavale ','Nick Cannon','Robert Carmine','Chris Carmack','Ryan Carnes','Anthony Catanzaro','Tom Hanks','The Rock','Keanu Reeves','Scarlett Johansson','Ellen Pompeo'],
+    // 'Athletes' : ['Muhammad Ali', 'Usain Bolt', 'Michael Jordan', 'Serena Williams', 'Michael Phelps', 'Roger Federer', 'Lionel Messi', 'Ronda Rousey','Allen Iverson','Wayne Gretzky','Michael Vick','Joe DiMaggio','John Elway','Conor McGregor','Lebron James','Alison Felix'],
+    // 'Animals' : ['Dog', 'Cat', 'Lion', 'Fish', 'Bird',  'Cattle', 'Donkey', 'Goat', 'Guinea Pig', 'Horse', 'Pig', 'Rabbit'],
+    'Animals': ['Dog', 'Cat', 'Lion', 'Fish', 'Bird',  'Cattle', 'Donkey', 'Goat', 'Guinea Pig', 'Horse', 'Pig', 'Rabbit', 'Student', 'Chicken'],
+    'Househould Appliance': ['microwave', 'oven', 'computer', 'refrigerator', 'toaster']
+    // 'Pokemon' : ['Bulbasaur','Ivysaur','Venusaur','Charmander','Charmeleon','Charizard','Squirtle','Wartortle','Blastoise','Caterpie','Metapod','Butterfree','Weedle','Kakuna','Beedrill','Pidgey','Pidgeotto','Pidgeot','Rattata','Raticate','Spearow','Fearow','Ekans','Arbok','Pikachu','Raichu','Sandshrew','Sandslash']
   };
 
   var randCat = categories[getRandomInt(categories.length)];
@@ -107,18 +109,33 @@ const startGame = () => {
     fsm4_list,
     playerOneTries,
     playerTwoTries,
-    gameover
-  });
+    gameover,
+  }, randCat);
 }
 
 
-const setGameStatus = (value) => {
+const setGameStatus = (value, randCat) => {
   io.emit("game state", value);
 
   if (status === Status.IN_GAME) {
     io.emit("new message", {
       type: "system",
-      content: `GAME START, Player 1: ${playerOne.username}, Player 2: ${playerTwo.username}`
+      content: "GAME START"
+    });
+
+    io.emit("new message", {
+      type: "system",
+      content: `Player 1: ${playerOne.username}`
+    });
+
+    io.emit("new message", {
+      type: "system",
+      content: `Player 2: ${playerTwo.username}`
+    });
+
+    io.emit("new message", {
+      type: "system",
+      content: `CATEGORY: ${randCat}`
     });
 
     io.emit("new message", {
@@ -364,10 +381,13 @@ io.on("connection", (socket) => {
     })
   })
 
-  if (users.length > 2 && status !== Status.IN_GAME) {
-    console.log("starting game")
-    startGame();
-  } else {
+  socket.on('start game', () => {
+    if (users.length > 2 && status !== Status.IN_GAME) {
+      startGame();
+    }
+  });
+
+  if (status !== Status.IN_GAME) {
     restartGame();
   }
   

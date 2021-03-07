@@ -33,7 +33,7 @@ function Landing() {
 
   return (
     <Grid style={styles.paperContainer} h="100vh" w="100vw" placeItems="center">
-      <Box textAlign="center" w="100%" maxW="20rem">
+      <Box backgroundColor="rgba(255, 255, 255, 0.3)" borderRadius="md" p="2rem" textAlign="center" w="100%" maxW="24rem">
         <Heading textColor="white" mb="1.5rem">Anyone's Guess</Heading>
         <Input  value={value} onChange={handleChange} color="white" mb="1rem" placeholder="In Game Name"/>
         <Button disabled={!value} w="50%" onClick={() => testAPI(value)}>Play Game</Button>

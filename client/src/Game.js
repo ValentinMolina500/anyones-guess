@@ -619,6 +619,13 @@ export default function ClientComponent() {
               <Text color="white">Wating for more players...</Text>
             </Flex>
           )}
+          {
+            gameState.status === Status.WAITING_FOR_PLAYERS && (
+              <Box textAlign="center" mt="1rem">
+                <Button onClick={() => socket.emit("start game")} colorScheme="teal">Start Game</Button>
+              </Box>
+            )
+          }
         </Box>
       </GridItem>
 
