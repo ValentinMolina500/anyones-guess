@@ -20,7 +20,6 @@ function Landing() {
   const history = useHistory();
 
   const testAPI = async (username) =>{
-    const result = await API.addPlayer(username);
     history.push('./Game');
   }
 

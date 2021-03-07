@@ -1,9 +1,94 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from "react";
+import socketClient from "socket.io-client";
+import {
+  Box,
+  Input,
+  List,
+  ListItem,
+  Button,
+  GridItem,
+  Grid,
+  Text
+} from "@chakra-ui/react";
+import socket from "./utilities/socket";
 
-function Game() {
+export default function ClientComponent() {
+  const [messages, setMessages] = useState([]);
+  const [value, setValue] = useState("");
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    socket.connect();
+    socket.on("users", (users) => {
+      setUsers(users);
+    });
+
+    socket.on("user connected", (user) => {
+      setUsers((oldUsers) => [...oldUsers, user]);
+    });
+    socket.on("user disconnected", (id) => {
+      console.log("id: ", id);
+      setUsers((oldUsers) => oldUsers.filter((user) => user.userID !== id));
+    });
+
+    socket.on("new message", (msg) => {
+      setMessages((oldMsgs) => [...oldMsgs, msg]);
+    });
+
+    return () => socket.disconnect();
+  }, []);
+
+  const renderUsers = () => {
+    return users.map((user, i) => {
+      return (
+        <ListItem p="0.5rem" key={i}>
+          {user.username}
+        </ListItem>
+      );
+    });
+  };
+
+  const renderMessages = () => {
+    return messages.map((msg, i) => {
+      return (
+        <ListItem bg={msg.id === socket.id ? "teal.600" : null} p="0.5rem" key={i}>
+          <Text fontSize="sm" color="gray.300">{msg.username}</Text>
+          <Text>{msg.content}</Text>
+        </ListItem>
+      );
+    });
+  };
+
+  const sendMsg = (e) => {
+    e.preventDefault();
+    if (value !== "") {
+      socket.emit("message sent", value);
+      setValue("");
+    }
+  };
+
   return (
-    <h1>Test</h1>
-  )
-}
+    <Grid gridTemplateColumns="auto 1fr" h="100vh" w="100vw">
+      <GridItem overflow="hidden" gridColumn="1" w="20rem" borderRight="1px solid" borderRightColor="gray.900">
+        <List overflowY="auto"  bg="gray.700" boxShadow="lg" color="white" minH="100vh">
+          {renderUsers()}
+        </List>
+      </GridItem>
 
-export default Game;
+      <GridItem overflow="hidden"  h="100%">
+        <Grid h="100%"  gridTemplateRows="1fr auto">
+          <List  overflowY="auto" bg="gray.800" color="white">
+            {renderMessages()}
+          </List>
+          <Box p="1rem" bg="gray.700" >
+            <form style={{display: "flex"}}>
+              <Input value={value} onChange={(e) => setValue(e.target.value)} color="white" variant="outline" placeholder="Outline" />
+              <Button ml="1rem" onClick={sendMsg} colorScheme="teal" type="submit">Send</Button>
+            </form>
+           
+          </Box>
+        </Grid>
+      </GridItem>
+    </Grid>
+  );
+}
