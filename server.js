@@ -37,8 +37,8 @@ let users = [];
 /* Game variables */
 let status = Status.WAITING_FOR_PLAYERS;
 let turnStatus = null;
-let playerOne = null;
-let playerTwo = null;
+let playerOne = {};
+let playerTwo = {};
 let currentPlayerTurn = null;
 let playerOneNoun = null;
 let playerTwoNoun = null;
@@ -130,6 +130,35 @@ const setGameStatus = (value) => {
   
 }
 
+const restartGame = (value) => {
+  status = Status.WAITING_FOR_PLAYERS;
+turnStatus = null;
+playerOne = {};
+ playerTwo = {};
+ currentPlayerTurn = null;
+playerOneNoun = null;
+playerTwoNoun = null;
+fsm2_list = [];
+ fsm4_list = [];
+playerOneTries = -1;
+ playerTwoTries = -1;
+ gameover = null;
+
+ io.emit("game state", {
+  playerOne,
+  playerTwo,
+  status,
+  currentPlayerTurn,
+  playerOneNoun,
+  playerTwoNoun,
+  turnStatus,
+  fsm2_list,
+  fsm4_list,
+  playerOneTries,
+  playerTwoTries,
+  gameover
+ });
+}
 io.on("connection", (socket) => {
   // fetch existing users
   // const users = []
@@ -164,6 +193,13 @@ io.on("connection", (socket) => {
   // notify users upon disconnection
   socket.on("disconnect", () => {
     users = users.filter((user) => user.userID !== socket.id);
+    if (users.length < 3) {
+      io.emit("new message", {
+        type: "system",
+        content: "ENDING GAME (NOT ENOUGH PLAYERS)"
+      })
+      restartGame();
+    } 
     socket.broadcast.emit("user disconnected", socket.id);
   });
 
@@ -332,23 +368,15 @@ io.on("connection", (socket) => {
     console.log("starting game")
     startGame();
   } else {
-    setGameStatus({
-      playerOne,
-      playerTwo,
-      status,
-      currentPlayerTurn,
-      playerOneNoun,
-      playerTwoNoun,
-      turnStatus,
-      fsm2_list,
-      fsm4_list,
-      playerOneTries,
-      playerTwoTries,
-      gameover
-    })
+    restartGame();
   }
   
   socket.on("player one guess", (guess) => {
+    io.emit("new message", {
+      content: guess,
+      type: "guess",
+      username: socket.username
+    })
     if (guess.trim().toLowerCase() === playerOneNoun.toLowerCase()) {
       io.emit("game win", playerOne)
     } else {
@@ -377,6 +405,11 @@ io.on("connection", (socket) => {
   })
 
   socket.on("player two guess", (guess) => {
+    io.emit("new message", {
+      content: guess,
+      type: "guess",
+      username: socket.username
+    })
     if (guess.trim().toLowerCase() === playerTwoNoun.toLowerCase()) {
       io.emit("game win", playerTwo)
     } else {
@@ -384,6 +417,7 @@ io.on("connection", (socket) => {
       if (playerTwoTries === 0) {
         io.emit("game win", playerOne);
       } else {
+        
         io.emit("game state", {
           playerOne,
           playerTwo,
