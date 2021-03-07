@@ -195,7 +195,7 @@ export default function ClientComponent() {
             </Text>
           </ListItem>
         );
-      } else {
+      } else if (msg.type === "playerTwoAsk"){
         return (
           <ListItem textAlign="center">
             <Text bg="blue.500" color="white">
@@ -203,6 +203,15 @@ export default function ClientComponent() {
             </Text>
           </ListItem>
         );
+      } else {
+        return (
+          <ListItem textAlign="center">
+            <Text fontStyle="italic"  color="white">
+              {`${msg.username} guessed ${msg.content}`}
+            </Text>
+          </ListItem>
+        )
+        
       }
     });
   };
