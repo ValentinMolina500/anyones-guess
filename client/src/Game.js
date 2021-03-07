@@ -266,21 +266,44 @@ export default function ClientComponent() {
   const renderWinModal = () => {
     if (socket.id === gameState.playerOne.userID) {
       if (socket.id === winner.userID) {
+        history.push({
+          pathname: './GameOver',
+          status: 'Win',
+        });
         return "You win!"
       } else {
+        history.push({
+          pathname: './GameOver',
+          status: 'Lost',
+        });
         return "You lost!"
       }
     }
 
     if (socket.id === gameState.playerTwo.userID) {
       if (socket.id === winner.userID) {
+        history.push({
+          pathname: './GameOver',
+          status: 'Win',
+        });
         return "You win!"
       } else {
+        history.push({
+          pathname: './GameOver',
+          status: 'Lost',
+        });
         return "You lost!"
       }
     }
 
-    return `${winner.username} won!`
+    else {
+      history.push({
+        pathname: './GameOver',
+        status: '',
+      });
+      return `${winner.username} won!`
+    }
+
   }
 
   const renderControls = () => {
